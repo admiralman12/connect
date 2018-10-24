@@ -46,7 +46,7 @@
   fixed 
   app
   dark
-  width="260"
+  width="250"
   v-model="drawer"
   class="menuaccent"
   >
@@ -114,20 +114,11 @@ export default {
     userAuthenticated() {
       return this.$store.getters.user !== null && this.$store.getters.user !== undefined
     },
-    user () {
-      return this.$store.getters.user
-    }
   },
-  watch: {
-    user (value) {
-      if (value == null || value == undefined) {
-          this.$router.push('/signin')
-      }
-    }
-  },  
   methods: {
     signUserOut() {
       this.$store.dispatch('signUserOut')
+      this.$router.push('/signin')
     }
   }
 }

@@ -4,7 +4,7 @@
         <v-layout row wrap justify-center>
           <v-flex xs12 md4 :key="n" v-for="n in 3">
               <v-card height=400>
-                <v-toolbar flat color="white">
+                <v-toolbar flat dense color="white">
                   <v-toolbar-title>Title</v-toolbar-title>
                 </v-toolbar>
                 <v-divider></v-divider>

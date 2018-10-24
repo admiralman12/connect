@@ -32,8 +32,8 @@
                       label="Password" 
                       id="password" 
                       type="password" 
+                      hint="Password must be 8 characters"
                       v-model="password" 
-                      :rules="[checkMin]"
                       required
                     >
                     </v-text-field>
@@ -52,7 +52,7 @@
                 <v-card-actions>
                   <v-btn block color="primary" @click="onSignUp" :loading="loading">Sign Up</v-btn>
                 </v-card-actions>
-                <v-alert v-if="error" v-model="error" color="error" icon="warning" outline transition="scale-transition">{{error.message}}</v-alert>
+                <v-alert v-if="error" v-model="error" color="error" icon="warning" outline transition="scale-transition">{{error}}</v-alert>
               </v-card>
             </v-flex>
           </v-layout>
@@ -61,55 +61,57 @@
     </v-app>
   </template>    
 <script>
+
+const fb = require('@/firebaseConfig.js')
+
 export default {
   data() {
     return {
       username: '',
       password: '',
-      confirmPassword: '',      
+      confirmPassword: '',    
+      loading: false,
+      error: ''  
     }
   },
-    computed: {
-        comparePasswords () {
-          return this.password !== this.confirmPassword ? 'Passwords do not match' : true
-        },
-        checkEmail() {
-          return this.username.length == 0 ? 'Email is required' : true
-        },
-        checkMin() {
-          return this.password.length < 8 ? 'Min 8 characters' : true
-        },
-        user () {
-            return this.$store.getters.user
-        },
-        error () {
-            return this.$store.getters.error
-        },
-        loading () {
-            return this.$store.getters.loading
-        }
+  computed: {
+      comparePasswords () {
+        return this.password !== this.confirmPassword ? 'Passwords do not match' : true
+      },
+      checkEmail() {
+        return this.username.length == 0 ? 'Email is required' : true
+      },
+      checkMin() {
+        return this.password.length < 8 ? 'Min 8 characters' : true
+      },
     },
-    watch: {
-        user (value) {
-            if (value !== null && value !== undefined) {
-                this.$router.push('/checkemail')
-            }
-        }
-    },
+
     methods: {
-        onSignUp () {
-          if (this.$refs.form.validate()) {
-            this.$store.dispatch('signUserUp', {email: this.username, password: this.password})
-          }
-        },
-        OnDismissed () {
-            this.$store.dispatch('clearError')
+      onSignUp () {
+        if (this.$refs.form.validate()) {
+          //this.$store.dispatch('signUserUp', {email: this.username, password: this.password})
+          this.loading = true
+          fb.auth.createUserWithEmailAndPassword(this.username, this.password).then(user => {
+            this.loading = false
+            fb.auth.currentUser.sendEmailVerification()
+            fb.auth.signOut()
+            this.$router.push('/checkEmail')
+          })
+          .catch(err => {
+            console.log(err)
+            this.loading = false
+            if (err.code == 'auth/invalid-email') {
+              err.message = 'Please enter a valid email address.'
+            }
+            this.error = err.message
+          })
         }
+      }
     }
 }
 </script>
 
-<style>
+<style scoped>
   #signup {
   height: 50%;
   width: 100%;

@@ -28,7 +28,7 @@
                     Forgot Password?
                   </router-link>
               </v-card-title>
-              <v-alert v-if="error" v-model="error" color="error" icon="warning" outline transition="scale-transition">{{error.message}}</v-alert>
+              <v-alert v-if="error" v-model="error" color="error" icon="warning" outline transition="scale-transition">{{error}}</v-alert>
             </v-card>
           </v-flex>
         </v-layout>
@@ -45,18 +45,14 @@ export default {
     return {
       username: 'cwmancini@gmail.com',
       password: 'admiral12',
+      loading: false,
+      error: ''
     }
   },
   computed: {
     user() {
       return this.$store.getters.user
     },
-    loading() {
-      return this.$store.getters.loading
-    },
-    error() {
-      return this.$store.getters.error
-    }
   },
   watch: {
     user (value) {
@@ -67,7 +63,19 @@ export default {
   },
   methods: {
     onSignIn () {
-      this.$store.dispatch('signUserIn', {email: this.username, password: this.password})
+      this.loading = true
+      fb.auth.signInWithEmailAndPassword(this.username, this.password).then(user => {
+          this.$store.commit('setUser', user)
+          this.loading = false
+          this.error = ''
+          console.log(user)
+      }).catch(err => {
+        if (err.code == 'auth/user-not-found') {
+          err.message = 'Email address not found. Please verify and try again.'
+        }
+        this.loading = false
+        this.error = err.message
+      })
     }
   }
 }
@@ -93,6 +101,9 @@ img {
 }
 a {
   text-decoration: none
+}
+.v-alert.v-alert--outline {
+  border: none !important;
 }
 </style>
   

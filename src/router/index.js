@@ -79,7 +79,7 @@ const router = new Router({
       )
     },
     {
-      path: '/checkemail',
+      path: '/checkemail',  
       name: 'EmailVerfication',
       component: () => import(
         '@/pages/user/EmailVerification.vue'
@@ -118,21 +118,32 @@ const router = new Router({
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  //reset any errors in the store
-  store.commit('clearError')
-  
+router.beforeEach((to, from, next) => {  
   //auth guard
   const requiresAuth = to.matched.some(x => x.meta.auth)
-  const currentUser = firebase.auth().currentUser
+  const checkEmail = to.matched.some(x => x.meta.checkEmail)
+  const currentUser = store.state.user.currentUser
+  const verifiedUser = store.state.user.emailVerified
+ 
 
-  if (requiresAuth && !currentUser) {
-      next('/signin')
-  } else if (requiresAuth && currentUser) {
-      next()
-  } else {
-      next()
-  }
+  if (requiresAuth && !currentUser) { //not logged in
+    console.log(1)
+    next('/signin')
+  } else if (requiresAuth && currentUser && !verifiedUser) { //logged in but not verified
+    console.log(2)
+    store.dispatch('signUserOut')
+    next('/checkEmail')
+  } else if (requiresAuth && verifiedUser) {//logged in and verified
+    console.log(3)
+    next()
+  } 
+  //else if (checkEmail && !currentUser && !verifiedUser) {//not logged in
+   // next('/signin')
+  //} 
+  else {
+    console.log(4)
+    next()
+  } 
 
   //update document title
   const docTitle = to.meta.title

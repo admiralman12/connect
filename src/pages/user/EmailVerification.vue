@@ -11,7 +11,10 @@
                     <h1 class="flex my-4 primary--text">Comps Connect</h1>
                   </div>
                   <p>
-                      We’ve sent an email to you with a link to activate your account. If you haven't received the email within a few minutes, please check your spam folder.
+                      We’ve sent an email to you with a link to activate your account. If you haven't received the email within a few minutes, please check your spam folder. After activating your account you may 
+                      <router-link to="/signin">
+                        <a>Log in!</a>
+                      </router-link>
                   </p>       
                 </v-card-text>
                 <v-card-title>
@@ -27,7 +30,7 @@
     </v-app>
   </template> 
 
-<style>
+<style scoped>
     #emailverification {
     height: 50%;
     width: 100%;
