@@ -21,14 +21,20 @@ export default {
         blankaction({commit}, payload) {
 
         },
-        fetchUserProfile({ commit, state }) {
+        fetchUserProfile({ commit, state, dispatch }) {
           //if email is verified 
           fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
-              //commit('setUserProfile', res.data())
-              console.log(res.data())
+              if(res.data()) {
+
+              } else {
+                dispatch('createUserProfile')
+              }
           }).catch(err => {
               console.log(err)
           })
+        },
+        createUserProfile({commit}) {
+          fb.usersCollection.doc(state.currentUser.uid).set().then()
         },        
         signUserOut({commit}) {
           fb.auth.signOut()
